@@ -1,0 +1,1221 @@
+/* VCM 91 — redesign mockup
+   Typography pairing inspired by santinicycling.com/tour-de-france/en/:
+   Poppins (body) + a bold condensed display face for headlines. Their
+   headline face (Acumin Pro Extra Condensed) is a paid Adobe/Typekit font
+   tied to their own license, so Barlow Condensed stands in here — same
+   tall/bold/italic-capable character, free on Google Fonts, and realistic
+   for the eventual Google Sites rebuild. */
+
+:root {
+  --navy: #1c2d67;
+  --navy-mid: #1e306f;
+  --navy-dark: #173268;
+  --white: #ffffff;
+  --red: #ee512f;
+  --orange: #ff7a3d;
+  --bg: #f5f6f8;
+  --text: #1c1f26;
+  --muted: #5a6472;
+  --border: #e2e5ea;
+  --radius: 14px;
+  --display: 'Barlow Condensed', sans-serif;
+  --body: 'Poppins', sans-serif;
+
+  /* The site's canonical brand gradient — starts on --navy-mid (the same
+     color the header itself uses, see .site-header) so the seam between
+     them disappears at every x-position, not just the center, then
+     dips into a slightly deeper navy at 28% before crossing into
+     red/orange from 69% to 100%. Only 4 stops on purpose: an earlier
+     version held flat on --navy from 0-13% before easing into
+     --navy-mid, which added a third close-but-distinct dark blue into
+     the first 28% of the gradient — smoother with just the two. Used
+     as-is on every other page's .hero; the home page's .hero-split (see
+     its own comment) reproduces this same shape with an added flat hold
+     at the very top for its own header-seam fix. */
+  --brand-gradient: linear-gradient(180deg, var(--navy-mid) 0%, var(--navy-dark) 28%, var(--red) 69%, var(--orange) 100%);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+/* ── Scroll-reveal (js/site.js) ────────────────────────
+   .reveal is added to every card/block by JS before it's observed; the
+   element sits slightly lower and transparent until it scrolls into view,
+   then eases up into place. .reveal-visible is what triggers the motion —
+   kept as a separate class (rather than toggling opacity directly) so the
+   transition itself lives here, in CSS, not in JS. */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.reveal-visible,
+.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+body {
+  margin: 0;
+  font-family: var(--body);
+  color: var(--text);
+  background: var(--white);
+  line-height: 1.6;
+}
+
+img { max-width: 100%; display: block; }
+
+a { color: inherit; }
+
+/* ── Google icons (Material Symbols Outlined) ─────────
+   Replaces emoji throughout the site. Sizing is set per usage via the
+   existing .embed-icon / .ph-icon / .icon-inline classes below — this
+   rule only fixes the glyph weight/alignment. */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  line-height: 1;
+}
+
+.icon-inline {
+  font-size: 1.05em;
+  vertical-align: -0.2em;
+  margin-right: 3px;
+}
+
+.wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ── Kicker / eyebrow label ─────────────────────────── */
+.kicker {
+  font-family: var(--display);
+  font-weight: 700;
+  font-style: italic;
+  font-size: 0.95rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin: 0 0 8px;
+}
+
+h1, h2, h3 {
+  font-family: var(--display);
+  font-weight: 800;
+  text-transform: uppercase;
+  line-height: 0.92;
+  margin: 0 0 16px;
+  letter-spacing: 0.5px;
+}
+
+h1 { font-size: clamp(2.8rem, 7vw, 5.2rem); }
+h2 { font-size: clamp(2.6rem, 5.6vw, 3.8rem); }
+h3 { font-size: 1.85rem; }
+
+.card h3 { font-size: 1.5rem; }
+
+p { color: var(--muted); margin: 0 0 16px; }
+
+/* Inline text links within regular prose — the global a{color:inherit}
+   (above) leaves them invisible against muted paragraph text otherwise. */
+p a {
+  color: var(--red);
+  text-decoration: underline;
+  text-decoration-color: rgba(238,81,47,0.4);
+}
+
+p a:hover { text-decoration-color: var(--red); }
+
+/* ── Top nav ────────────────────────────────────────── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--navy-mid);
+  border-bottom: 3px solid transparent;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+/* Toggled by js/site.js once the page has scrolled — a plain navy header
+   at rest, with the red accent line and a drop shadow appearing on scroll. */
+.site-header.scrolled {
+  border-bottom-color: var(--red);
+  box-shadow: 0 2px 12px rgba(23,50,104,0.25);
+}
+
+.site-header .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 76px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--white);
+}
+
+/* No badge/circle — the logo sits directly on the header, sized to match
+   the "VCM 91" wordmark next to it. */
+.brand-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.brand-mark .brand-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--orange);
+}
+
+/* Real logo — content/images/vcm91-logo-header.png (see MANIFEST.md).
+   Height matches .brand-name's font-size so the two read as one lockup.
+   The onerror handler on the <img> falls back to the three-dot mark below
+   if the file is ever missing, so the header never shows a broken image.
+   Was 2.6rem (41.6px) — taller than .site-header .wrap's own fixed 76px
+   height once line-height is factored in, so it silently overflowed the
+   header row (centered by align-items:center, so half the overflow
+   pushed up past the header's top edge, half down over the hero below
+   it — the actual cause of hero content looking cut off on load, not a
+   padding problem there). */
+.brand-logo-img {
+  height: 1.9rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.brand-dots-fallback {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+/* The same three-dot motif, blown up and near-invisible, as an optional
+   texture on a block — use sparingly. */
+.dots-bg {
+  position: relative;
+  overflow: hidden;
+}
+
+.dots-bg > * { position: relative; z-index: 1; }
+
+.dots-bg::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  top: -40px;
+  right: -40px;
+  width: 260px;
+  height: 90px;
+  background-image: radial-gradient(circle, var(--orange) 10px, transparent 10px);
+  background-size: 44px 44px;
+  background-repeat: repeat-x;
+  background-position: 0 20px;
+  opacity: 0.08;
+  pointer-events: none;
+}
+
+.brand-name {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.9rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+nav.main-nav {
+  display: flex;
+  gap: 4px;
+}
+
+nav.main-nav a {
+  color: rgba(255,255,255,0.82);
+  text-decoration: none;
+  font-size: 0.86rem;
+  font-weight: 600;
+  padding: 10px 14px;
+  border-radius: 999px;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+nav.main-nav a:hover,
+nav.main-nav a.active {
+  background: rgba(255,255,255,0.12);
+  color: var(--white);
+}
+
+/* Hidden by default (desktop); shown only below 1024px, see the media
+   query at the bottom of the file, which also turns nav.main-nav itself
+   into the dropdown panel this button opens (site.js toggles the
+   .nav-open class on it and swaps this icon between menu/close). */
+.nav-toggle {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 999px;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.nav-toggle:hover { background: rgba(255,255,255,0.2); }
+
+/* ── Buttons ────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 14px 28px;
+  border-radius: 999px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+/* Solid white on both hero usages, since the backdrop behind this button
+   ranges from navy through red to orange (see --brand-gradient) — a red
+   button loses all contrast over the red/orange part of that gradient.
+   White reads clearly against every stop. */
+.btn-primary {
+  background: var(--white);
+  color: var(--navy);
+  box-shadow: 0 10px 24px rgba(23,50,104,0.3);
+}
+
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(23,50,104,0.38); }
+
+.btn-ghost {
+  background: rgba(255,255,255,0.1);
+  color: var(--white);
+  border: 1.5px solid rgba(255,255,255,0.5);
+}
+
+.btn-ghost:hover { background: rgba(255,255,255,0.2); }
+
+/* ── Hero ───────────────────────────────────────────── */
+.hero {
+  position: relative;
+  /* --hero-h is set per-page as an inline custom property (each page's
+     own desktop height) rather than hardcoded here, so the responsive
+     rule below can scale it by a fraction without needing every page's
+     specific value duplicated into that media query too. */
+  min-height: var(--hero-h, 78vh);
+  display: flex;
+  align-items: flex-end;
+  color: var(--white);
+  background: var(--brand-gradient);
+  overflow: hidden;
+}
+
+.hero .ph-frame { position: absolute; inset: 0; border-radius: 0; }
+
+/* Les groupes, Programme des groupes, La vie du Club, Rallye — no
+   --brand-gradient behind the photo on these pages specifically.
+   Histoire du Club, Le bureau, Nous contacter, and the home page keep
+   the default gradient. */
+.hero-no-gradient { background: var(--white); }
+
+.hero video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+/* Soft white blur-blend into the next (white) section — same technique
+   on every page's hero, homepage included (this rule, not a per-page
+   override, is what produces it everywhere). z-index:1 is required, not
+   decorative: it must sit above the background photo/video (.hero video,
+   z-index:0 above) to actually fade it, while staying below
+   .hero-content's z-index:2 so foreground text/CTAs stay crisp. On the
+   home page's hero-split (no z-index on .hero-inner, see its comment)
+   z-index:1 alone is already higher than that auto-level content, so
+   the same rule fades .hero-inner's whole subtree there too — no
+   separate override needed.
+   The box overhangs past the hero's edges on all sides (bottom AND
+   left/right) on purpose: filter: blur() softens this element's own
+   alpha at ITS box edges too, not just the gradient's colors, so an
+   edge sitting exactly on the crop line would let a sliver of whatever
+   is behind it peek through right where overflow:hidden cuts it off.
+   Overhanging every edge past the crop line pushes that blurred
+   softening safely into the clipped-away region, and the gradient
+   reaches solid white at 33% of the box's own height (~92% of the
+   hero's total height), leaving a solid, fully-opaque white margin
+   before the visible crop line. */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: -6%;
+  right: -6%;
+  bottom: -12%;
+  height: 30%;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, var(--white) 33%);
+  filter: blur(28px);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  padding: 64px 24px;
+  width: 100%;
+}
+
+.hero p.lead {
+  color: rgba(255,255,255,0.88);
+  max-width: 620px;
+  font-size: 1.05rem;
+}
+
+/* Orange underline under "Vélo Club" / "Massy 91" in the headline —
+   text-decoration rather than border-bottom, so it sits tucked under
+   the letterforms (and skips descenders) instead of needing manual
+   offset math tied to line-height. */
+.headline-underline {
+  text-decoration-line: underline;
+  text-decoration-color: var(--orange);
+  text-decoration-thickness: 8px;
+  text-underline-offset: 1px;
+}
+
+.hero-ctas { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 8px; }
+
+/* Forces the ghost button + logo onto their own line below — flex-basis:
+   100% claims the whole row's width, and since .hero-ctas already wraps,
+   the remaining items flow onto a second line instead of squeezing in
+   beside this stacked button+footnote group. */
+.cta-with-note {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  flex-basis: 100%;
+}
+
+.cta-footnote {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.7);
+  max-width: 380px;
+  margin: 0;
+}
+
+/* Federation affiliation badge — height matched to the "Voir le
+   programme" ghost button's actual rendered height: .btn's 14px
+   top/bottom padding + its 0.95rem font-size at the body's inherited
+   1.6 line-height (15.2px × 1.6 = 24.32px) + .btn-ghost's 1.5px border
+   on each edge = 14+14 + 24.32 + 1.5+1.5 = 55.32px. (align-self: stretch
+   was tried instead of a fixed number, but with flex-wrap active the
+   logo ended up alone on its own wrapped line with nothing to stretch
+   to match, and blew up to its raw intrinsic size instead.) */
+.ffvelo-logo { height: 55.3px; width: auto; }
+
+/* ── Split hero (Accueil) — text on the left, jersey video card on the
+   right in the foreground, instead of a full-bleed background video.
+   White text (from .hero). Full viewport height (rather than .hero's
+   usual 78vh) with align-items: center (below) so the content sits
+   centered in the viewport on load. */
+.hero-split {
+  overflow: hidden;
+  align-items: center;
+  min-height: var(--hero-h, 100vh);
+  /* No background override — inherits .hero's --brand-gradient directly.
+     This used to be its own gradient with a flat 100px navy hold at the
+     top, needed because .hero-scroll (below) pulled the section up 100px
+     under the sticky header. That pull-up is gone now (it was hiding
+     real content behind the header on actual mobile browsers — the
+     hero's kicker/h1 rendered underneath the header instead of below
+     it), and with it the mismatch it was covering for: the header and
+     --brand-gradient already start on the identical --navy-mid, so a
+     plain, unshifted hero already meets the header with zero seam. */
+}
+
+.hero-inner {
+  /* No z-index here on purpose — a positioned element WITH a z-index
+     creates a new stacking context, which would isolate the jersey
+     video's mix-blend-mode from ever reaching .hero's gradient
+     background further up the tree. Position alone (no z-index) does
+     not create that isolation. This also means .hero::after (the bottom
+     fade, defined near .hero above, a later sibling at z-index:1) still
+     naturally paints above this whole subtree despite its own z-index
+     being auto, which is what lets it fade the jersey out along with
+     the gradient near the bottom. */
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+  /* Top padding only, reduced by 50px (was 72px) — desktop-only since
+     the 880px breakpoint below has its own separate padding override
+     for mobile, untouched by this. Bottom stays 72px. */
+  padding: 22px 24px 72px;
+}
+
+.hero-media {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* No card look — the jersey video's own background is a near-white
+   studio backdrop, and mix-blend-mode: multiply makes white pixels
+   disappear against whatever's behind them, so the jersey floats
+   directly on the white patch below instead of sitting in a framed box. */
+.hero-media-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+/* White patch sized to roughly the jersey's own footprint, sitting
+   between the white halo above and the video itself — together they're
+   what the multiply-blended video actually blends against, letting its
+   near-white background pixels resolve back to (near-)white instead of
+   the section's own colored gradient. */
+.hero-media-frame::before {
+  content: "";
+  position: absolute;
+  inset: -6%;
+  pointer-events: none;
+  border-radius: 12%;
+  background: var(--white);
+}
+
+.hero-media-frame video {
+  mix-blend-mode: multiply;
+  border-radius: 46px;
+}
+
+.jersey-tag {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  background: var(--white);
+  color: var(--navy);
+  font-family: var(--display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.85rem;
+  padding: 9px 18px;
+  border-radius: 999px;
+  box-shadow: 0 8px 22px rgba(23,50,104,0.35);
+}
+
+.page-hero {
+  min-height: var(--hero-h, 42vh);
+  align-items: center;
+  text-align: center;
+}
+
+.page-hero .hero-content { padding: 96px 24px 56px; }
+.page-hero p.lead { margin: 0 auto; text-align: center; }
+
+/* ── Scroll-scrubbed hero video (Accueil) ───────────────
+   Tall wrapper + a sticky 100vh pane inside it — scrolling through the
+   wrapper's extra height drives the video's currentTime via JS, so the
+   jersey "spins" as you scroll instead of autoplaying on loop. No
+   negative margin here — see .hero-split's comment for why the previous
+   -100px pull-up (to tuck the hero under the sticky header) was removed:
+   it was hiding the hero's own heading behind the header on real mobile
+   browsers. */
+.hero-scroll { position: relative; height: 260vh; }
+.hero-scroll .hero { position: sticky; top: 0; height: 100vh; min-height: unset; }
+
+/* ── Sections ───────────────────────────────────────── */
+section { padding: 88px 0; }
+section.alt { background: var(--bg); }
+
+.section-head { max-width: 640px; margin: 0 auto 48px; text-align: center; }
+.section-head p { margin: 0; }
+
+/* ── Placeholder image frames ─────────────────────────
+   Clean and flat — no grey box behind real photos, and a plain (not
+   diagonally-striped) placeholder for images not yet added. */
+.ph-frame {
+  position: relative;
+  aspect-ratio: var(--ar, 4 / 3);
+  overflow: hidden;
+  border-radius: var(--radius);
+  background: transparent;
+}
+
+.ph-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ph-fallback {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-align: center;
+  padding: 16px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.ph-fallback .ph-icon { font-size: 1.6rem; opacity: 0.55; }
+.ph-fallback .ph-name { font-family: monospace; font-size: 0.72rem; background: rgba(255,255,255,0.7); padding: 2px 8px; border-radius: 6px; }
+.ph-fallback .ph-desc { font-size: 0.74rem; max-width: 200px; }
+
+/* ── Cards ──────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+
+/* Nous contacter's info/map columns — was an inline
+   grid-template-columns that no media query could override (same class
+   of bug as the homepage's two cards had). Stacks to one column below
+   tablet width instead of squeezing a 0.9fr/1.1fr split into a narrow
+   viewport. */
+.contact-grid { grid-template-columns: 0.9fr 1.1fr; align-items: start; }
+
+@media (max-width: 880px) {
+  .contact-grid { grid-template-columns: 1fr; }
+}
+
+.card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(28,45,103,0.04);
+}
+
+.card-body { padding: 24px; }
+
+.card h3 { margin-bottom: 8px; }
+
+.pace-pill {
+  display: inline-block;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.5px;
+  color: var(--red);
+  margin-bottom: 10px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.meta-row strong { color: var(--text); }
+
+.contact-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+  width: 100%;
+}
+
+/* ── Embed placeholder blocks (Google Calendar / HelloAsso) ── */
+.embed-block {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 48px 24px;
+  text-align: center;
+  background: var(--bg);
+  color: var(--muted);
+}
+
+.embed-icon { font-size: 2rem; margin-bottom: 12px; display: inline-block; }
+.embed-block strong,
+.announce-card strong {
+  display: block;
+  font-family: var(--display);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text);
+  font-size: 1.6rem;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+/* ── Announcements (Accueil) ─────────────────────────
+   A warm brand-tinted band, split into two solid cards — the forum notice
+   and the new-jersey preview — replacing the dashed "embed placeholder"
+   look used elsewhere, since these two are real content, not future-embed
+   markers. */
+.section-announce {
+  background: linear-gradient(135deg, rgba(28,45,103,0.06) 0%, rgba(255,122,61,0.09) 100%);
+}
+
+.announce-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.announce-card {
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: 0 8px 24px rgba(28,45,103,0.08);
+}
+
+.announce-card p { margin: 0; }
+
+.jersey-gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.jersey-variant { text-align: center; }
+
+.variant-name {
+  font-family: var(--display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-size: 0.95rem;
+  color: var(--text);
+  margin: 10px 0 6px;
+}
+
+.status-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.status-badge.status-available {
+  background: #e3f5ea;
+  color: #1f7a44;
+}
+
+.status-badge.status-soon {
+  background: #ffe9dc;
+  color: #b3501a;
+}
+
+/* ── Info notes + group legend (Programme des groupes) ── */
+.info-notes { display: flex; flex-direction: column; gap: 14px; }
+
+.info-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.info-note .material-symbols-outlined {
+  color: var(--red);
+  font-size: 1.3rem;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.group-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.group-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 14px 8px 8px;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.group-chip .group-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--white);
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
+/* ── Filter bar (pills on desktop, dropdown on mobile) ── */
+.filter-bar { display: flex; justify-content: center; margin-bottom: 40px; }
+
+.filter-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+.filter-pill {
+  font-family: var(--body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 9px 20px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.filter-pill:hover { border-color: var(--red); color: var(--red); }
+
+.filter-pill.active {
+  background: var(--red);
+  border-color: var(--red);
+  color: var(--white);
+}
+
+.filter-dropdown {
+  display: none;
+  width: 100%;
+  max-width: 320px;
+  font-family: var(--body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--white);
+  border: 1.5px solid var(--border);
+  border-radius: 999px;
+  padding: 12px 18px;
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235a6472' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='m6 9 6 6 6-6'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  background-size: 16px;
+}
+
+.schedule-empty {
+  text-align: center;
+  color: var(--muted);
+  padding: 40px 0;
+  font-size: 0.95rem;
+}
+
+/* ── Timeline (Histoire du Club) ────────────────────── */
+.timeline {
+  position: relative;
+  max-width: 760px;
+  margin: 0 auto;
+  padding-left: 32px;
+  border-left: 3px solid var(--border);
+}
+
+.timeline-item { position: relative; padding-bottom: 40px; }
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -40px;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--red);
+  border: 3px solid var(--white);
+  box-shadow: 0 0 0 2px var(--red);
+}
+
+.timeline-year {
+  font-family: var(--display);
+  font-weight: 800;
+  font-size: 1.6rem;
+  color: var(--navy);
+  margin-bottom: 4px;
+}
+
+/* ── Blog-style articles (La vie du Club) ─────────────
+   Big 2-column layout — gallery/photo on the left, text on the right.
+   Articles with more than one photo get an inline scroll gallery (orange
+   rounded arrows + dots, bottom-right, same row); every article also gets
+   a "Voir plus" trigger that opens the shared full-screen lightbox. ── */
+.blog-list { display: flex; flex-direction: column; gap: 72px; }
+
+.blog-post {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 44px;
+  align-items: center;
+}
+
+.blog-media { position: relative; }
+
+.blog-gallery {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  aspect-ratio: 4 / 3;
+  box-shadow: 0 18px 40px rgba(28,45,103,0.12);
+}
+
+.blog-gallery-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.blog-gallery-track .ph-frame {
+  flex: 0 0 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+
+.view-more-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.92);
+  color: var(--navy);
+  font-family: var(--body);
+  font-weight: 600;
+  font-size: 0.8rem;
+  padding: 9px 16px 9px 12px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.view-more-btn:hover { background: var(--white); }
+.view-more-btn .material-symbols-outlined { font-size: 16px; }
+
+/* Arrows + dots share one row, bottom-right of the gallery. */
+.gallery-nav {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gallery-dots { display: flex; align-items: center; gap: 6px; }
+
+.gallery-dots .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.gallery-dots .dot.active { background: var(--white); transform: scale(1.3); }
+
+.gallery-arrows { display: flex; gap: 8px; }
+
+.gallery-arrow {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--orange);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(23,50,104,0.3);
+  transition: background 0.15s, transform 0.15s;
+}
+
+.gallery-arrow:hover { background: var(--red); transform: scale(1.08); }
+.gallery-arrow .material-symbols-outlined { font-size: 18px; }
+
+.blog-text h3 { margin-bottom: 12px; }
+.blog-text p { margin: 0; }
+
+.news-date {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 10px;
+  display: block;
+}
+
+/* ── Full-screen "Voir plus" lightbox ──────────────────
+   Reused by every article — populated by JS from whichever post was
+   opened. Same image-left / text-right layout as the cards, maximized. */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(23,50,104,0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.lightbox-overlay.open { opacity: 1; pointer-events: auto; }
+
+.lightbox-inner {
+  position: relative;
+  background: var(--white);
+  border-radius: 26px;
+  width: 100%;
+  max-width: 1140px;
+  max-height: 88vh;
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  overflow: hidden;
+}
+
+.lightbox-media { position: relative; background: var(--navy-dark); height: 100%; }
+.lightbox-media .blog-gallery { border-radius: 0; box-shadow: none; height: 100%; aspect-ratio: auto; }
+
+.lightbox-text {
+  padding: 48px 40px;
+  overflow-y: auto;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 5;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(23,50,104,0.55);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  cursor: pointer;
+}
+
+/* Prev/next ARTICLE (not photo) — bottom corners of the whole lightbox,
+   like a blog's "Previous post" / "Next post" footer nav. Small text,
+   icon-only on narrow phones. */
+.lightbox-post-nav {
+  position: absolute;
+  bottom: 16px;
+  z-index: 6;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(23,50,104,0.6);
+  color: var(--white);
+  font-family: var(--body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 8px 13px;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lightbox-post-nav:hover { background: rgba(23,50,104,0.85); }
+.lightbox-post-nav .material-symbols-outlined { font-size: 15px; }
+.lightbox-post-nav.prev { left: 16px; }
+.lightbox-post-nav.next { right: 16px; }
+
+.lightbox-text { padding-bottom: 64px; }
+
+@media (max-width: 560px) {
+  .lightbox-post-nav .post-nav-label { display: none; }
+  .lightbox-post-nav { padding: 8px; }
+}
+
+/* ── Contact / bureau cards ─────────────────────────── */
+.person-card { text-align: center; padding: 28px 20px; }
+
+.person-avatar {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.3rem;
+  margin: 0 auto 14px;
+}
+
+.person-role {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 4px;
+}
+
+/* ── Footer ─────────────────────────────────────────── */
+/* The same gradient recipe as the hero (var(--brand-gradient)) — the blend
+   lives entirely inside this block, from its own top to its own bottom,
+   with a normal sharp edge where it meets the section above/below. Not a
+   bleed effect like the hero's — just the same gradient, self-contained,
+   flipped vertically so the page bookends: orange at the footer's top,
+   down to blue at its bottom. */
+footer.site-footer {
+  background: var(--navy);
+  color: rgba(255,255,255,0.7);
+  padding: 48px 0 28px;
+  font-size: 0.85rem;
+}
+
+footer.site-footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+footer.site-footer a { color: var(--white); text-decoration: none; }
+
+.foot-brand {
+  font-family: var(--display);
+  font-weight: 700;
+  color: var(--white);
+  font-size: 1.1rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.foot-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.ffvelo-logo-footer { height: 44px; width: auto; }
+
+/* ── Responsive ─────────────────────────────────────── */
+
+/* Hamburger nav — separate breakpoint from the 880px block below since
+   this is specifically about the nav, not general layout stacking.
+   nav.main-nav itself becomes the dropdown panel (position:absolute,
+   hidden by default) rather than a separate menu element, so its
+   existing links/styling doesn't need duplicating for mobile. */
+@media (max-width: 1024px) {
+  .site-header .wrap { position: relative; }
+
+  .nav-toggle { display: inline-flex; }
+
+  nav.main-nav {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 24px;
+    right: 24px;
+    flex-direction: column;
+    gap: 2px;
+    background: var(--navy-mid);
+    padding: 12px;
+    border-radius: 14px;
+    box-shadow: 0 16px 32px rgba(23,50,104,0.35);
+  }
+
+  nav.main-nav.nav-open { display: flex; }
+
+  nav.main-nav a { padding: 14px 16px; border-radius: 10px; }
+
+  /* Gradient/hero height at 60% of its desktop size below tablet width.
+     --hero-h holds each page's own desktop value (set inline per
+     section, see .hero's comment), so this one rule scales all of them
+     proportionally instead of needing every page's specific vh number
+     repeated here. */
+  .hero { min-height: calc(var(--hero-h, 78vh) * 0.6); }
+  .page-hero { min-height: calc(var(--hero-h, 42vh) * 0.6); }
+  .hero-split { min-height: calc(var(--hero-h, 100vh) * 0.6); }
+}
+
+@media (max-width: 880px) {
+  .blog-post { grid-template-columns: 1fr; gap: 20px; }
+  .lightbox-inner { grid-template-columns: 1fr; grid-template-rows: auto 1fr; overflow-y: auto; }
+  .lightbox-media { aspect-ratio: 4/3; }
+  .hero-inner { grid-template-columns: 1fr; gap: 36px; padding: 48px 24px; }
+  /* Responsive only — desktop's hero already starts flush below the
+     header with no gap needed. */
+  .hero-split { min-height: unset; padding-top: 120px; }
+  .hero-text { text-align: center; }
+  .hero-ctas { justify-content: center; }
+  .filter-pills { display: none; }
+  .filter-dropdown { display: block; }
+  .filter-bar { justify-content: stretch; }
+}
