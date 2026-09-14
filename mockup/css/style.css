@@ -1215,6 +1215,11 @@ footer.site-footer a { color: var(--white); text-decoration: none; }
   .hero-split { min-height: unset; padding-top: 120px; }
   .hero-text { text-align: center; }
   .hero-ctas { justify-content: center; }
+  /* .cta-with-note is a flex column, so the ancestor's text-align:center
+     above doesn't reach its children (flex items ignore text-align) —
+     needs its own align-items to actually center the button + footnote. */
+  .cta-with-note { align-items: center; }
+  .cta-footnote { text-align: center; }
   .filter-pills { display: none; }
   .filter-dropdown { display: block; }
   .filter-bar { justify-content: stretch; }
