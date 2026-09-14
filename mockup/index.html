@@ -59,7 +59,7 @@
       <div class="hero-media">
         <span class="jersey-tag">Nouveau maillot 2026</span>
         <div class="hero-media-frame">
-          <video id="heroVideo" muted playsinline preload="auto" poster="media/jersey-hero-poster.jpg">
+          <video id="heroVideo" muted playsinline webkit-playsinline preload="auto" poster="media/jersey-hero-poster.jpg">
             <source src="media/jersey-hero.mp4" type="video/mp4">
           </video>
         </div>
@@ -77,7 +77,25 @@
 
   var ready = false;
   var ticking = false;
-  video.addEventListener('loadedmetadata', function () { ready = true; });
+
+  function markReady() {
+    if (ready) return;
+    ready = true;
+    // iOS Safari won't repaint a scrubbed frame on a video that has never
+    // actually played, even with currentTime set — prime it with a
+    // silent play/pause so later scroll-driven currentTime writes show up.
+    var playAttempt = video.play();
+    if (playAttempt && typeof playAttempt.then === 'function') {
+      playAttempt.then(function () { video.pause(); onScroll(); }).catch(function () { onScroll(); });
+    } else {
+      video.pause();
+      onScroll();
+    }
+  }
+
+  video.addEventListener('loadedmetadata', markReady);
+  video.addEventListener('loadeddata', markReady);
+  video.addEventListener('canplay', markReady);
 
   function scrub() {
     ticking = false;
@@ -87,7 +105,7 @@
     var progress = -rect.top / scrollable;
     progress = Math.max(0, Math.min(1, progress));
 
-    if (ready && video.duration && video.readyState >= 2) {
+    if (ready && video.duration) {
       video.currentTime = progress * video.duration;
     }
   }
@@ -101,6 +119,7 @@
 
   window.addEventListener('scroll', onScroll, { passive: true });
   window.addEventListener('resize', onScroll);
+  video.load();
   onScroll();
 })();
 </script>
